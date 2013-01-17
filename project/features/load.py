@@ -3,7 +3,7 @@
 import codecs
 
 
-class LoadFeatures():
+class LoadDataFile():
     """
     Loads Features for classification
     """
