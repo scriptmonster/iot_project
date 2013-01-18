@@ -1,6 +1,6 @@
 # -*- coding : utf-8 -*- 
 
-import codecs
+import codecs, re
 
 
 class LoadDataFile():
@@ -42,6 +42,12 @@ class LoadDataFile():
         self.__closeFile()
         return txt
 
+    def __removeNewLine(self, input):
+        """Removes \\n char at the end of the each line"""
+        if input is None:
+            return None
+        return re.sub('\n$','',input)
+
 
     def __readLine(self):
         """Reads a line at every call of the method, when EOF reached returns None"""
@@ -51,8 +57,7 @@ class LoadDataFile():
             txt = self.file.readline()
         else:
             txt = None
-
-        return txt
+        return self.__removeNewLine(txt)
 
     def readFile(self):
         return self.__readFile()
