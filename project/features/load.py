@@ -1,5 +1,7 @@
 # -*- coding : utf-8 -*- 
 
+from random import randint
+
 import codecs, re
 
 
@@ -15,6 +17,8 @@ class LoadDataFile():
         self.fileEncoding = kwargs.get('encoding', 'utf-8')
         self.file = None
         self.__fileOpen = False
+
+        self.__defineRegexPatterns()
 
     def __openFile(self):
         """Opens file with specified encoding(default utf-8) and set fileOpen flag True"""
@@ -32,6 +36,27 @@ class LoadDataFile():
         self.file.close()
         self.__fileOpen = False
 
+    def __defineRegexPatterns(self):
+        self.regex = {}
+        self.regex['newLineChar'] = re.compile('\n$')
+        self.regex['decimal'] = re.compile("(^| )&lt;DECIMAL&gt;( |$)")
+        self.regex['digit'] = re.compile("(^| )&lt;#&gt;( |$)")
+        self.regex['time'] = re.compile("(^| )&lt;TIME&gt;( |$)")
+        self.regex['url'] = re.compile("(^| )&lt;URL&gt;( |$)")
+        self.regex['email'] = re.compile("(^| )&lt;EMAIL&gt;( |$)")
+
+
+    def __refillParams(self, input):
+        """There exists some removed values in dataset, such as decimal numbers, digits, time, url, email and etc.
+        This metod randomly replaces these values to increase feature quality"""
+        input = re.sub(self.regex['decimal'], str(randint(2,5)), input)
+        input = re.sub(self.regex['digit'], '3', input)
+        input = re.sub(self.regex['time'], '%d:%d' %(randint(0,23),randint(0,59)), input)
+        input = re.sub(self.regex['url'], 'http://www.com', input)
+        input = re.sub(self.regex['email'], 'mail@domain.com', input)
+
+        return input
+
     def __readFile(self):
         """Reads all of the file at once and returns the text"""
         self.__openFile()
@@ -42,11 +67,11 @@ class LoadDataFile():
         self.__closeFile()
         return txt
 
-    def __removeNewLine(self, input):
+    def __removeNewLineChar(self, input):
         """Removes \\n char at the end of the each line"""
         if input is None:
             return None
-        return re.sub('\n$','',input)
+        return self.__refillParams(re.sub(self.regex['newLineChar'],'',input))
 
 
     def __readLine(self):
@@ -57,7 +82,7 @@ class LoadDataFile():
             txt = self.file.readline()
         else:
             txt = None
-        return self.__removeNewLine(txt)
+        return self.__removeNewLineChar(txt)
 
     def readFile(self):
         return self.__readFile()
