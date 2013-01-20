@@ -2,7 +2,7 @@
 
 from nltk.stem.porter import PorterStemmer
 from itertools import groupby
-from scipy import mean
+#from numpy import mean
 
 import re
 
@@ -109,10 +109,14 @@ class CollectWordBaseFeatures():
                 features.append(len(words))
 
         if self.isAverageWordLength:
-            if self.addSmileysToWords:
-                features.append(mean(map(len, words + smileys)))
-            else:
-                features.append(mean(map(len, words)))
+            try:
+                if self.addSmileysToWords:
+                    features.append(sum(map(len, words + smileys))/len(words + smileys))
+                else:
+                    features.append(sum(map(len, words))/len(words))
+
+            except ZeroDivisionError:
+                features.append(0);
 
         if self.isTotalNumOfDifferentWords:
             if self.addSmileysToWords:
@@ -135,6 +139,9 @@ class CollectWordBaseFeatures():
         if self.isYulesI:
             features.append(self.__yule(words))
 
+        if self.isTotalNumOfSmileys:
+            features.append(len(smileys))
+        
         return features
 
     def getFeatures(self, input):
