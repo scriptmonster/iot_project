@@ -25,7 +25,8 @@ def main():
     txt = ldf.readLine()
     while txt:
         klass, message = parseLine(txt, linePattern)
-        print klass, '$', message, '$', ccbf.getFeatures(message), cwbf.getFeatures(message)
+        #print klass, '$', message, '$', ccbf.getFeatures(message), cwbf.getFeatures(message)
+        print message, ', '.join(map(str,ccbf.getFeatures(message) + cwbf.getFeatures(message))) + ' - > ' + klass
         txt = ldf.readLine()
 
 
